@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Unit Test - Backend') {
+        stage('Execute Unit Tests') {
+            parallel {
+            stage('Unit Test - Backend') {
             agent {
                 docker {
                     image 'snakee/golang-junit:1.21'
@@ -57,6 +59,14 @@ pipeline {
                     junit 'bugtracker-frontend/test-results.xml'
                 }
             }
+        }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
