@@ -12,20 +12,25 @@ pipeline {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     dir('bugtracker-backend') {
-                    sh '''
-                        export GOCACHE="$PWD/.cache/go-build"
-                        export GOMODCACHE="$PWD/.cache/go-mod"
-                        mkdir -p "$GOCACHE"
-                        mkdir -p "$GOMODCACHE"
+                        sh '''
+                            export GOCACHE="$PWD/.cache/go-build"
+                            export GOMODCACHE="$PWD/.cache/go-mod"
+                            mkdir -p "$GOCACHE"
+                            mkdir -p "$GOMODCACHE"
 
-                        echo "Go cache directory: $GOCACHE"
-                        echo "Go module cache directory: $GOMODCACHE"
-                        go env GOCACHE
-                        go env GOMODCACHE
+                            echo "Go cache directory: $GOCACHE"
+                            echo "Go module cache directory: $GOMODCACHE"
+                            go env GOCACHE
+                            go env GOMODCACHE
 
-                        go test -v ./...
-                    '''
+                            go test -v ./... | go-junit-report > test-results.xml
+                        '''
                     }
+                }
+            }
+            post {
+                always {
+                    junit 'bugtracker-backend/test-results.xml'
                 }
             }
         }
@@ -38,11 +43,13 @@ pipeline {
                 }
             }
             steps {
-                dir('bugtracker-frontend') {
-                    sh '''
-                        npm ci
-                        npm test
-                    '''
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    dir('bugtracker-frontend') {
+                        sh '''
+                            npm ci
+                            npm test
+                        '''
+                    }
                 }
             }
             post {
