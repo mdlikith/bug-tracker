@@ -2,27 +2,44 @@ pipeline {
     agent any
 
     stages {
-        stage('Unit Test - Backend') {
+        // stage('Unit Test - Backend') {
+        //     agent {
+        //         docker {
+        //             image 'snakee/golang-junit:1.21'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         dir('bugtracker-backend') {
+        //             sh '''
+        //                 export GOCACHE="$PWD/.cache/go-build"
+        //                 export GOMODCACHE="$PWD/.cache/go-mod"
+        //                 mkdir -p "$GOCACHE"
+        //                 mkdir -p "$GOMODCACHE"
+
+        //                 echo "Go cache directory: $GOCACHE"
+        //                 echo "Go module cache directory: $GOMODCACHE"
+        //                 go env GOCACHE
+        //                 go env GOMODCACHE
+
+        //                 go test -v ./...
+        //             '''
+        //         }
+        //     }
+        // }
+
+        stage('Unit Test - Frontend') {
             agent {
                 docker {
-                    image 'snakee/golang-junit:1.21'
+                    image 'node:20-alpine'
                     reuseNode true
                 }
             }
             steps {
-                dir('bugtracker-backend') {
+                dir('bugtracker-frontend') {
                     sh '''
-                        export GOCACHE="$PWD/.cache/go-build"
-                        export GOMODCACHE="$PWD/.cache/go-mod"
-                        mkdir -p "$GOCACHE"
-                        mkdir -p "$GOMODCACHE"
-
-                        echo "Go cache directory: $GOCACHE"
-                        echo "Go module cache directory: $GOMODCACHE"
-                        go env GOCACHE
-                        go env GOMODCACHE
-
-                        go test -v ./...
+                        npm ci
+                        npm test
                     '''
                 }
             }
