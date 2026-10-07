@@ -11,7 +11,15 @@ pipeline {
             }
             steps {
                 dir('bugtracker-backend') {
-                    sh 'go test -v ./...'
+                    sh '''
+                        export GOCACHE="$PWD/.cache/go-build"
+                        mkdir -p "$GOCACHE"
+
+                        echo "Go cache directory: $GOCACHE"
+                        go env GOCACHE
+
+                        go test -v ./...
+                    '''
                 }
             }
         }
