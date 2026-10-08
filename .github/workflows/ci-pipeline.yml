@@ -126,6 +126,7 @@ jobs:
         working-directory: ./tests-e2e
         run: |
           npm ci
+          npx playwright install
           npx playwright test
 
       - name: Stop Application
