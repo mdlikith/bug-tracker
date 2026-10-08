@@ -113,6 +113,36 @@ pipeline {
                 }
             }
         }
+
+        stage('Execute E2E Tests') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.44.0-focal'
+                    reuseNode true
+                    args '-u 0 --network=host'
+                }
+            }
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    dir('tests-e2e') {
+                        sh '''
+                            npm ci
+                            npx playwright test
+                        '''
+                    }
+                }
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: 'tests-e2e/test-results/results.xml'
+                    publishHTML target: [
+                        reportDir: 'tests-e2e/test-results',
+                        reportFiles: 'results.xml',
+                        reportName: 'E2E Test Report'
+                    ]
+                }
+            }
+        }
     }
 
     post {
