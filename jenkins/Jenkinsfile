@@ -46,7 +46,7 @@ pipeline {
                             dir('bugtracker-frontend') {
                                 sh '''
                             npm ci
-                            npm audit fix
+                            npm audit fix --force
                             npm test
                         '''
                             }
