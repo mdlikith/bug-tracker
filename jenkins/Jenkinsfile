@@ -95,7 +95,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     dir('tests-api') {
                         sh '''
-                            npx wait-port http://localhost:8080 --timeout=300000
+                            npx wait-port http://localhost:8080/api/health --timeout=300000
                             npm ci
                             npx playwright test
                         '''
