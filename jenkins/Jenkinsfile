@@ -88,7 +88,7 @@ pipeline {
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    dir('test-api') {
+                    dir('tests-api') {
                         sh '''
                             npx wait-port http://localhost:8080 --timeout=300000
                             npm ci
@@ -99,9 +99,9 @@ pipeline {
             }
             post {
                 always {
-                    junit 'test-api/test-results/results.xml'
+                    junit 'tests-api/test-results/results.xml'
                     publishHTML target: [
-                        reportDir: 'test-api/test-results',
+                        reportDir: 'tests-api/test-results',
                         reportFiles: 'results.xml',
                         reportName: 'API Test Report'
                     ]
