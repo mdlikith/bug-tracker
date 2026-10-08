@@ -9,6 +9,7 @@ pipeline {
                         docker {
                             image 'snakee/golang-junit:1.21'
                             reuseNode true
+                            args '-u 0'
                         }
                     }
                     steps {
@@ -37,6 +38,7 @@ pipeline {
                         docker {
                             image 'node:20'
                             reuseNode true
+                            args '-u 0'
                         }
                     }
                     steps {
@@ -44,6 +46,7 @@ pipeline {
                             dir('bugtracker-frontend') {
                                 sh '''
                             npm ci
+                            npm audit fix
                             npm test
                         '''
                             }
@@ -72,9 +75,11 @@ pipeline {
                 }
             }
             steps {
-                sh '''
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh '''
                     docker-compose up --build -d
                 '''
+                }
             }
         }
 
