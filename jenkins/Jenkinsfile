@@ -4,17 +4,17 @@ pipeline {
     stages {
         stage('Execute Unit Tests') {
             parallel {
-            stage('Unit Test - Backend') {
-            agent {
-                docker {
-                    image 'snakee/golang-junit:1.21'
-                    reuseNode true
-                }
-            }
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    dir('bugtracker-backend') {
-                        sh '''
+                stage('Unit Test - Backend') {
+                    agent {
+                        docker {
+                            image 'snakee/golang-junit:1.21'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            dir('bugtracker-backend') {
+                                sh '''
                             export GOCACHE="$PWD/.cache/go-build"
                             export GOMODCACHE="$PWD/.cache/go-mod"
                             mkdir -p "$GOCACHE"
@@ -27,39 +27,39 @@ pipeline {
 
                             go test -v ./... | go-junit-report > test-results.xml
                         '''
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            junit 'bugtracker-backend/test-results.xml'
+                        }
                     }
                 }
-            }
-            post {
-                always {
-                    junit 'bugtracker-backend/test-results.xml'
-                }
-            }
-        }
 
-        stage('Unit Test - Frontend') {
-            agent {
-                docker {
-                    image 'node:20'
-                    reuseNode true
-                }
-            }
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    dir('bugtracker-frontend') {
-                        sh '''
+                stage('Unit Test - Frontend') {
+                    agent {
+                        docker {
+                            image 'node:20'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            dir('bugtracker-frontend') {
+                                sh '''
                             npm ci
                             npm test
                         '''
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            junit 'bugtracker-frontend/test-results.xml'
+                        }
                     }
                 }
-            }
-            post {
-                always {
-                    junit 'bugtracker-frontend/test-results.xml'
-                }
-            }
-        }
             }
         }
 
@@ -78,7 +78,7 @@ pipeline {
             }
         }
 
-        stage ('Execute API Tests') {
+        stage('Execute API Tests') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.44.0-focal'
@@ -90,7 +90,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     dir('test-api') {
                         sh '''
-                            npx wait-port http://localhost:8080 --timeout=30000
+                            npx wait-port http://localhost:8080 --timeout=300000
                             npm ci
                             npx playwright test
                         '''
