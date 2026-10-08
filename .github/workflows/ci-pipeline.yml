@@ -73,7 +73,7 @@ jobs:
 
       - name: Launch Application
         run: |
-          docker-compose up --build -d
+          docker compose up --build -d
           npx wait-port http://localhost:8080/api/health --timeout=300000
 
 
