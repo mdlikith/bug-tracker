@@ -16,7 +16,7 @@ pipeline {
                         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                             dir('bugtracker-backend') {
                                 sh '''
-                                go test -v ./... | go-junit-report > test-results.xml
+                                go test -v ./... 2>&1 | go-junit-report > test-results.xml
                         '''
                             }
                         }
